@@ -18,13 +18,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/cache@v2
-        with:
-          path: ~/.cache
-          key: cypress-cache-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-
       - name: Install pnpm
         uses: pnpm/action-setup@v2.2.1
+        with:
+          version: 6.32.3
 
       - name: Use Node.js v16
         uses: actions/setup-node@v2
