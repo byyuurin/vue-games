@@ -27,9 +27,9 @@ Since TypeScript cannot handle type information for `.vue` imports, they are shi
 - [UnoCSS](https://github.com/unocss/unocss) - the instant on-demand atomic CSS engine
   - [@unocss/transformer-directives](https://github.com/unocss/unocss/tree/main/packages/transformer-directives) - UnoCSS transformer for `@apply` directive
 
-### Icons
+### Icons [🔍](https://icones.netlify.app/)
 
-- [Iconify](https://iconify.design/) - use icons from any icon sets [Icônes](https://icones.netlify.app/)
+- [Iconify](https://iconify.design/) - use icons from any icon sets
 - [Pure CSS Icons via UnoCSS](https://github.com/unocss/unocss/tree/main/packages/preset-icons)
 
 ### Plugins
