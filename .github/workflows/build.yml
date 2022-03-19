@@ -1,46 +1,31 @@
-# 檔案要放到 .github/workflows 底下, 副檔名 .yml
-# 文件名稱
-name: Deploy
-# 觸發時機
+name: Deploying to GitHub Pages
 on:
   push:
     branches:
       - master
-# 執行工作列表
+
 jobs:
-  build-and-deploy:
-    # 執行環境
+  deploy:
     runs-on: ubuntu-latest
-    # 執行步驟
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v2
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2.2.1
+      - uses: pnpm/action-setup@v2.2.1
         with:
-          version: 6.32.3
+          version: 6
 
-      - name: Use Node.js v16
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@v2
         with:
           node-version: v16
           registry-url: https://registry.npmjs.org/
           cache: pnpm
 
-      - name: Install and Build
-        run: |
+      - run: |
           pnpm install
-          npx vite -v
           npx vite build --base=/${{ github.event.repository.name }}/
+          cp dist/index.html dist/404.html
 
-      - name: Create 404.html
-        run: cp dist/index.html dist/404.html
-
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@4.1.5
+      - uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
           BRANCH: gh-pages
           FOLDER: dist
