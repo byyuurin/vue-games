@@ -1,4 +1,4 @@
-import { defineConfig, presetAttributify, presetIcons, presetUno } from 'unocss'
+import { defineConfig, presetAttributify, presetIcons, presetWind } from 'unocss'
 import transformerDirective from '@unocss/transformer-directives'
 import { createMixins } from './src/utils/unocss'
 
@@ -39,7 +39,7 @@ export default defineConfig({
         verticalAlign: 'middle'
       }
     }),
-    presetUno()
+    presetWind()
   ],
   transformers: [transformerDirective()],
   safelist: []
