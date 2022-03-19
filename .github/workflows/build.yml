@@ -31,9 +31,11 @@ jobs:
           cache: pnpm
 
       - name: Install and Build
+        env:
+          BASE_URL: /${{ github.event.repository.name }}/
         run: |
           pnpm install
-          pnpm build:gh-pages
+          pnpm build
 
       - name: Create 404.html
         run: cp dist/index.html dist/404.html
