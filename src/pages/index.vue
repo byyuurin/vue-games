@@ -4,8 +4,9 @@ meta:
 </route>
 
 <template>
-  <div text="center light:#2c3e50" pt-100px>
-    <img m-auto alt="Vue logo" src="../assets/logo.png">
-    <hello-world msg="Hello Vue 3 + TypeScript + Vite" />
+  <div text="center" p="x-8 y-24">
+    <router-link btn text-2xl to="/minesweeper">
+      Minesweeper
+    </router-link>
   </div>
 </template>
