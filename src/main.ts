@@ -11,7 +11,7 @@ import routes from '~pages'
 const head = createHead()
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
 
