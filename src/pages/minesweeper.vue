@@ -4,19 +4,29 @@ meta:
 </route>
 
 <script lang="ts" setup>
+import { breakpoints } from '../composables/shared'
 import type { CreateGameOptions, MineBlock } from '../composables/minesweeper'
 import { createGame } from '../composables/minesweeper'
 
-const config = {
-  easy: { width: 8, height: 8, mines: 10 },
-  medium: { width: 16, height: 16, mines: 40 },
-  hard: { width: 16, height: 30, mines: 99 }
-}
+const config = computed(() => {
+  const result = {
+    easy: { width: 8, height: 8, mines: 10 },
+    medium: { width: 16, height: 16, mines: 40 },
+    hard: { width: 30, height: 16, mines: 99 }
+  }
 
-type PlayOption = keyof typeof config
+  if (!breakpoints.xl.value) {
+    result.hard.width = 16
+    result.hard.height = 30
+  }
+
+  return result
+})
+
+type GameConfig = keyof typeof config.value
 
 const options = ref<CreateGameOptions>({
-  ...config['easy'],
+  ...unref(config)['easy'],
   friendly: true
 })
 const game = createGame(options)
@@ -42,7 +52,7 @@ function blockAttrs(item: MineBlock) {
   return { counts, dangered, flagged, viewed, disabled }
 }
 
-function resetGame(option: PlayOption | CreateGameOptions) {
+function resetGame(option: GameConfig | CreateGameOptions) {
   const { friendly } = unref(options.value)
 
   // https://zh.wikipedia.org/wiki/%E8%B8%A9%E5%9C%B0%E9%9B%B7
@@ -50,7 +60,7 @@ function resetGame(option: PlayOption | CreateGameOptions) {
     case 'easy':
     case 'medium':
     case 'hard':
-      options.value = { ...config[option], friendly }
+      options.value = { ...unref(config)[option], friendly }
       break
     default:
       options.value = option
@@ -67,7 +77,7 @@ function resetGame(option: PlayOption | CreateGameOptions) {
     </h2>
 
     <div flex="~ wrap gap-2" justify-center>
-      <button btn="~ sky" @click="resetGame(options)">
+      <button btn="~ sky" :disabled="!dashboard.started" @click="resetGame(options)">
         New Game
       </button>
       <button btn @click="resetGame('easy')">
@@ -79,9 +89,9 @@ function resetGame(option: PlayOption | CreateGameOptions) {
       <button btn @click="resetGame('hard')">
         Hard
       </button>
-      <button btn disabled>
+      <!-- <button btn disabled>
         Customize
-      </button>
+      </button> -->
     </div>
   </div>
 

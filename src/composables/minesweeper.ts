@@ -78,11 +78,12 @@ function generateBoard(options: MaybeRef<CreateGameOptions>) {
 
 function generateMines(state: Ref<GameState>, options: MaybeRef<CreateGameOptions>, exclude: MinePosition) {
   const { width, height, mines, friendly = false } = unref(options)
-  const positions = nearbyPositions(exclude, options).concat(exclude)
-  const seeds: MinePosition[] = []
+  const maybes: MinePosition[] = []
 
-  const random = () => seeds.splice(Math.floor(Math.random() * seeds.length), 1)[0]
-  const safely = (p: MinePosition) => positions.filter(({ x, y }) => p.x === x && p.y === y).length > 0
+  const random = () => maybes.splice(Math.floor(Math.random() * maybes.length), 1)[0]
+  const safely = (p: MinePosition) =>
+    nearbyPositions(exclude, options).concat(exclude)
+      .filter(({ x, y }) => p.x === x && p.y === y).length > 0
 
   // 更新地雷格周圍八格的地雷計數
   const updateMineCounts = (center: MinePosition) => {
@@ -92,9 +93,10 @@ function generateMines(state: Ref<GameState>, options: MaybeRef<CreateGameOption
     })
   }
 
+  // 建立所有可能出現地雷的座標
   for (let y = 0;y < height; y++) {
     for (let x = 0; x < width; x++)
-      if (!(friendly && safely({ x, y }))) seeds.push({ x, y })
+      if (!(friendly && safely({ x, y }))) maybes.push({ x, y })
   }
 
   let times = 0
@@ -165,7 +167,7 @@ export function createGame(options: MaybeRef<CreateGameOptions>) {
 
   // 過關條件
   // 1. 全部地雷被標記
-  // 2. 未顯示數量 = 剩餘地雷數量
+  // 2. 剩餘地雷數量 = 未顯示數量
   const checkStatus = () => {
     const { started, dangers, unknowns } = unref(dashboard)
 
