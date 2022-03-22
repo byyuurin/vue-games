@@ -29,6 +29,7 @@ interface GameState {
     begin: number
     end: number
   }
+  options: CreateGameOptions
   status: GameStatus | null
   board: MineBlock[][]
 }
@@ -52,7 +53,8 @@ function nearbyPositions(center: MinePosition, options: MaybeRef<CreateGameOptio
   })).filter(({ x, y }) => x >= 0 && x < width && y >= 0 && y < height)
 }
 
-function expandBlocks(state: Ref<GameState>, current: MineBlock, options: MaybeRef<CreateGameOptions>) {
+function expandBlocks(state: Ref<GameState>, current: MineBlock) {
+  const { options } = unref(state)
   // 不處理已展開區塊
   if (current.viewed) return
 
@@ -64,7 +66,7 @@ function expandBlocks(state: Ref<GameState>, current: MineBlock, options: MaybeR
   if (current.counts === 0) {
     nearbyPositions(current.position, options).forEach((position) => {
       const target = state.value.board[position.y][position.x]
-      expandBlocks(state, target, options)
+      expandBlocks(state, target)
     })
   }
 }
@@ -76,8 +78,9 @@ function generateBoard(options: MaybeRef<CreateGameOptions>) {
       .map((_, x) => ({ position: { x, y }, counts: 0 } as MineBlock)))
 }
 
-function generateMines(state: Ref<GameState>, options: MaybeRef<CreateGameOptions>, exclude: MinePosition) {
-  const { width, height, mines, friendly = false } = unref(options)
+function generateMines(state: Ref<GameState>, exclude: MinePosition) {
+  const { options } = unref(state)
+  const { width, height, mines, friendly = false } = options
   const maybes: MinePosition[] = []
 
   const random = () => maybes.splice(Math.floor(Math.random() * maybes.length), 1)[0]
@@ -110,16 +113,17 @@ function generateMines(state: Ref<GameState>, options: MaybeRef<CreateGameOption
   }
 }
 
-export function createGame(options: MaybeRef<CreateGameOptions>) {
+export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
 
   const state = useSessionStorage<GameState>('minesweeper-state', {
+    options: unref(gameOptions),
     timestamp: { begin: 0, end: 0 },
     status: null,
-    board: generateBoard(options)
+    board: generateBoard(gameOptions)
   })
 
   const dashboard = computed(() => {
-    const { width, height } = unref(options)
+    const { width, height } = unref(state).options
     const { timestamp } = unref(state)
     let unknowns = width * height // 未知數量
     let flags = 0 // 已標記數量
@@ -138,7 +142,7 @@ export function createGame(options: MaybeRef<CreateGameOptions>) {
       flags,
       dangers,
       unknowns,
-      unusedFlags: unref(options).mines - flags
+      unusedFlags: unref(state).options.mines - flags
     }
   })
 
@@ -148,7 +152,8 @@ export function createGame(options: MaybeRef<CreateGameOptions>) {
    * 重置遊戲
    */
   const reset = () => {
-    state.value.board = generateBoard(options)
+    state.value.board = generateBoard(unref(gameOptions))
+    state.value.options = unref(gameOptions)
 
     if (!dashboard.value.started) return
 
@@ -182,7 +187,7 @@ export function createGame(options: MaybeRef<CreateGameOptions>) {
    */
   const uncover = (position: MinePosition) => {
     if (!dashboard.value.started) {
-      generateMines(state, options, position)
+      generateMines(state, position)
       state.value.timestamp.begin = Date.now()
     }
 
@@ -192,7 +197,7 @@ export function createGame(options: MaybeRef<CreateGameOptions>) {
     if (target.flagged) return
     if (target.dangered) return stop('lose')
 
-    expandBlocks(state, target, options)
+    expandBlocks(state, target)
     checkStatus()
   }
 
@@ -201,6 +206,7 @@ export function createGame(options: MaybeRef<CreateGameOptions>) {
    * @param position 座標
    */
   const autoUncover = (position: MinePosition) => {
+    const { options } = unref(state)
     const target = find(position)
 
     if (state.value.status) return
@@ -214,7 +220,7 @@ export function createGame(options: MaybeRef<CreateGameOptions>) {
     })
 
     if (dangerCounts === 0)
-      nearbyBlocks.forEach((block) => expandBlocks(state, block, options))
+      nearbyBlocks.forEach((block) => expandBlocks(state, block))
 
     checkStatus()
   }
@@ -224,7 +230,7 @@ export function createGame(options: MaybeRef<CreateGameOptions>) {
    * @param position 座標
    */
   const mark = (position: MinePosition) => {
-    const { mines } = unref(options)
+    const { mines } = unref(state).options
     const target = find(position)
 
     if (state.value.status) return

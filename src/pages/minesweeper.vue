@@ -15,22 +15,26 @@ const config = computed(() => {
     hard: { width: 30, height: 16, mines: 99 }
   }
 
-  if (!breakpoints.xl.value) {
-    result.hard.width = 16
-    result.hard.height = 30
-  }
-
   return result
 })
 
-type GameConfig = keyof typeof config.value
+type GameConfig = keyof typeof config.value | 'customize'
 
-const options = ref<CreateGameOptions>({
+const gameOptions = ref<CreateGameOptions>({
   ...unref(config)['easy'],
   friendly: true
 })
-const game = createGame(options)
+const game = createGame(gameOptions)
 const { state, dashboard } = game
+const customizeVisible = ref(false)
+const customize = ref<CreateGameOptions>({
+  ...unref(state).options,
+  mines: 15
+})
+const customizeMines = computed(() => {
+  const { width, height, mines } = unref(customize)
+  return Math.round(width * height * mines / 100)
+})
 const now = useNow()
 const timeAgo = computed(() => {
   const { begin, end } = state.value.timestamp
@@ -38,7 +42,6 @@ const timeAgo = computed(() => {
 
   if (begin && end)
     diff = end - begin
-
 
   if (begin && !end)
     diff = +now.value - begin
@@ -53,19 +56,36 @@ function blockAttrs(item: MineBlock) {
 }
 
 function resetGame(option: GameConfig | CreateGameOptions) {
-  const { friendly } = unref(options.value)
+  const { friendly } = unref(gameOptions)
+  let options: CreateGameOptions = {} as any
 
   // https://zh.wikipedia.org/wiki/%E8%B8%A9%E5%9C%B0%E9%9B%B7
   switch (option) {
     case 'easy':
     case 'medium':
     case 'hard':
-      options.value = { ...unref(config)[option], friendly }
+      options = { ...unref(config)[option], friendly }
+      break
+    case 'customize':
+      options = {
+        width: customize.value.width,
+        height: customize.value.height,
+        mines: customizeMines.value,
+        friendly: customize.value.friendly
+      }
       break
     default:
-      options.value = option
+      options = option
   }
 
+  if (!breakpoints.xl.value && options.width > options.height) {
+    const { width } = options
+    options.width = options.height
+    options.height = width
+  }
+
+  customizeVisible.value = false
+  gameOptions.value = options
   game.reset()
 }
 </script>
@@ -77,7 +97,7 @@ function resetGame(option: GameConfig | CreateGameOptions) {
     </h2>
 
     <div flex="~ wrap gap-2" justify-center>
-      <button btn="~ sky" :disabled="!dashboard.started" @click="resetGame(options)">
+      <button btn="~ sky" :disabled="!dashboard.started" @click="resetGame(state.options)">
         New Game
       </button>
       <button btn @click="resetGame('easy')">
@@ -89,14 +109,14 @@ function resetGame(option: GameConfig | CreateGameOptions) {
       <button btn @click="resetGame('hard')">
         Hard
       </button>
-      <!-- <button btn disabled>
+      <button btn @click="customizeVisible=true">
         Customize
-      </button> -->
+      </button>
     </div>
   </div>
 
   <div text-center>
-    <div p-6 text-2xl flex="~ gap-4" justify-center items-center>
+    <div p-6 text="2xl black/75 dark:white/75" flex="~ gap-4" justify-center items-center>
       <div flex="~ gap-1" justify-center items-center>
         <i i-mdi-clock-time-twelve-outline />
         <span>{{ timeAgo }}</span>
@@ -126,6 +146,39 @@ function resetGame(option: GameConfig | CreateGameOptions) {
       </div>
     </div>
   </div>
+
+  <div v-show="customizeVisible" fixed top-0 left-0 z-20 w-full h-full bg="black/50" flex="~" justify-center items-center>
+    <div flex-grow max-w-screen-sm mx-4 p-4 rounded bg="gray-500/20">
+      <div text-2xl leading="3em">
+        Customize Settings
+      </div>
+      <label flex="~ gap-1 col">
+        Width: {{ customize.width }}
+        <input v-model.number="customize.width" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="50">
+      </label>
+      <label flex="~ gap-1 col">
+        Height: {{ customize.height }}
+        <input v-model.number="customize.height" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="50">
+      </label>
+      <label flex="~ gap-1 col">
+        Mines: {{ customizeMines }} ({{ customize.mines }}%)
+        <input v-model.number="customize.mines" p="2" bg="gray-500/10" text="red-200" type="range" min="15" max="85">
+      </label>
+      <label flex="~ gap-4" items-center>
+        Friendly:
+        <input v-model="customize.friendly" p="2" bg="gray-500/10" text="red-200" type="checkbox">
+      </label>
+
+      <div py-8 flex="~ gap-4" justify-center>
+        <button btn="~ sky" @click="resetGame('customize')">
+          Confirm
+        </button>
+        <button btn="solid-sky" @click="customizeVisible=false">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <!--
@@ -145,4 +198,6 @@ function resetGame(option: GameConfig | CreateGameOptions) {
   - [v] 優化地雷隨機產生邏輯
   - [v] 提示遊戲進行時間
   - [v] 保存遊戲狀態(Session Storage)
+  - [v] 增加自定選項
+  - [ ] 優化記憶體使用
 -->
