@@ -1,10 +1,21 @@
-# Vue 3 + Typescript + Vite
+# Vue Games
 
-This template should help get you started developing with Vue 3 and Typescript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Some tiny games clone in Vue 3
+
+## Game List
+
+- [Minesweeper](https://byyuurin.github.io/vue-games/minesweeper)
+
+<summary>
+<details>
+
+# Vue 3 + TypeScript + Vite + UnoCSS
+
+This template should help get you started developing with Vue 3, TypeScript and UnoCSS in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
 ## Recommended IDE Setup
 
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
+- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [UnoCSS](https://marketplace.visualstudio.com/items?itemName=antfu.unocss)
 
 ## Type Support For `.vue` Imports in TS
 
@@ -40,3 +51,5 @@ Since TypeScript cannot handle type information for `.vue` imports, they are shi
 - [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components) - components auto import
 - [VueUse](https://github.com/antfu/vueuse) - collection of essential Vue Composition Utilities
   - [@vueuse/head](https://github.com/vueuse/head) - document head manager for Vue 3
+</details>
+</summary>
