@@ -6,6 +6,7 @@ Some tiny games clone in Vue 3
 
 - [Minesweeper](https://byyuurin.github.io/vue-games/minesweeper)
 
+
 <summary>
 <details>
 
