@@ -35,10 +35,7 @@ const statusClasses = computed(() => {
 
     if (!props.flagged)
       result.push('hover:bg-opacity-20 active:bg-opacity-25')
-
   }
-
-
 
   return result
 })
