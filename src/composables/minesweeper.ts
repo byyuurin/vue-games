@@ -22,6 +22,12 @@ export interface CreateGameOptions {
   friendly?: boolean
 }
 
+interface GameCache {
+  flags: number
+  dangers: number
+  unknowns: number
+}
+
 type GameStatus = 'win' | 'lose'
 
 interface GameState {
@@ -34,9 +40,31 @@ interface GameState {
   board: MineBlock[][]
 }
 
-function updateBlock(state: Ref<GameState>, position: MinePosition, diff: Partial<MineBlock>) {
+function updateGameCache(cache: Ref<GameCache>, target: MineBlock, diff: Partial<MineBlock>) {
+  let { flags, dangers, unknowns } = unref(cache)
+
+  // toggle flag
+  if ('flagged' in diff) flags += target.flagged ? -1 : 1
+  if ('flagged' in diff && target.dangered) {
+    unknowns -= diff.flagged ? 1 : -1
+    dangers -= diff.flagged ? 1 : -1
+  }
+
+  // uncover or autoUncover
+  if ('viewed' in diff && !target.viewed) unknowns--
+
+  // generate mines
+  if ('dangered' in diff) dangers += diff.dangered ? 1 : -1
+
+  cache.value = { flags, dangers, unknowns }
+}
+
+function updateBlock(cache: Ref<GameCache> | null, state: Ref<GameState>, position: MinePosition, diff: Partial<MineBlock>) {
   const { x, y } = position
   const raw = state.value.board[y][x]
+
+  if (cache) updateGameCache(cache, raw, diff)
+
   state.value.board[y][x] = { ...raw, ...diff }
 }
 
@@ -53,20 +81,20 @@ function nearbyPositions(center: MinePosition, options: MaybeRef<CreateGameOptio
   })).filter(({ x, y }) => x >= 0 && x < width && y >= 0 && y < height)
 }
 
-function expandBlocks(state: Ref<GameState>, current: MineBlock) {
+function expandBlocks(cache: Ref<GameCache>, state: Ref<GameState>, current: MineBlock) {
   const { options } = unref(state)
   // 不處理已展開區塊
   if (current.viewed) return
 
   // 不處理地雷或已標記區塊
   if (!current.dangered && !current.flagged)
-    updateBlock(state, current.position, { viewed: true })
+    updateBlock(cache, state, current.position, { viewed: true })
 
   // 周圍無地雷的區塊可繼續展開
   if (current.counts === 0) {
     nearbyPositions(current.position, options).forEach((position) => {
       const target = state.value.board[position.y][position.x]
-      expandBlocks(state, target)
+      expandBlocks(cache, state, target)
     })
   }
 }
@@ -78,7 +106,7 @@ function generateBoard(options: MaybeRef<CreateGameOptions>) {
       .map((_, x) => ({ position: { x, y }, counts: 0 } as MineBlock)))
 }
 
-function generateMines(state: Ref<GameState>, exclude: MinePosition) {
+function generateMines(cache: Ref<GameCache>, state: Ref<GameState>, exclude: MinePosition) {
   const { options } = unref(state)
   const { width, height, mines, friendly = false } = options
   const maybes: MinePosition[] = []
@@ -92,7 +120,7 @@ function generateMines(state: Ref<GameState>, exclude: MinePosition) {
   const updateMineCounts = (center: MinePosition) => {
     nearbyPositions(center, options).forEach((position) => {
       const { counts } = state.value.board[position.y][position.x]
-      updateBlock(state, position, { counts: counts + 1 })
+      updateBlock(null, state, position, { counts: counts + 1 })
     })
   }
 
@@ -106,15 +134,34 @@ function generateMines(state: Ref<GameState>, exclude: MinePosition) {
   while (times < mines) {
     const position = random()
 
-    updateBlock(state, position, { dangered: true })
+    updateBlock(cache, state, position, { dangered: true })
     updateMineCounts(position)
 
     times++
   }
 }
 
-export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
+function createGameCache(state: GameState) {
+  const { board, options } = state
+  let unknowns = options.width * options.height // 未知數量
+  let flags = 0 // 已標記數量
+  let dangers = 0 // 危險數量
 
+  board.forEach(items=>items.forEach(item=>{
+    if (item.flagged) flags++
+    if (item.flagged && item.dangered) return unknowns--
+    if (item.viewed) return unknowns--
+    if (item.dangered) return dangers++
+  }))
+
+  return ref<GameCache>({
+    flags,
+    dangers,
+    unknowns
+  })
+}
+
+export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
   const state = useSessionStorage<GameState>('minesweeper-state', {
     options: unref(gameOptions),
     timestamp: { begin: 0, end: 0 },
@@ -122,27 +169,15 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
     board: generateBoard(gameOptions)
   })
 
+  const cache = createGameCache(unref(state))
+
   const dashboard = computed(() => {
-    const { width, height } = unref(state).options
-    const { timestamp } = unref(state)
-    let unknowns = width * height // 未知數量
-    let flags = 0 // 已標記數量
-    let dangers = 0 // 危險數量
-
-    state.value.board.forEach((row) => row.forEach((column) =>{
-      flags += column.flagged ? 1 : 0
-
-      if (column.viewed) return unknowns--
-      if (column.dangered && column.flagged) return unknowns--
-      if (column.dangered) return dangers++
-    }))
-
+    const { timestamp, options } = unref(state)
+    const { flags, dangers, unknowns } = unref(cache)
     return {
+      flags, dangers, unknowns,
       started: timestamp.begin > 0,
-      flags,
-      dangers,
-      unknowns,
-      unusedFlags: unref(state).options.mines - flags
+      unusedFlags: options.mines - flags
     }
   })
 
@@ -152,6 +187,12 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
    * 重置遊戲
    */
   const reset = () => {
+    const { width, height } = unref(gameOptions)
+    cache.value = {
+      dangers: 0,
+      flags: 0,
+      unknowns: width * height
+    }
     state.value.board = generateBoard(unref(gameOptions))
     state.value.options = unref(gameOptions)
 
@@ -187,7 +228,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
    */
   const uncover = (position: MinePosition) => {
     if (!dashboard.value.started) {
-      generateMines(state, position)
+      generateMines(cache, state, position)
       state.value.timestamp.begin = Date.now()
     }
 
@@ -197,7 +238,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
     if (target.flagged) return
     if (target.dangered) return stop('lose')
 
-    expandBlocks(state, target)
+    expandBlocks(cache, state, target)
     checkStatus()
   }
 
@@ -220,7 +261,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
     })
 
     if (dangerCounts === 0)
-      nearbyBlocks.forEach((block) => expandBlocks(state, block))
+      nearbyBlocks.forEach((block) => expandBlocks(cache, state, block))
 
     checkStatus()
   }
@@ -237,9 +278,9 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
     if (target.viewed) return
     if (dashboard.value.flags >= mines && !target.flagged) return
 
-    updateBlock(state, position, { flagged: !target.flagged })
+    updateBlock(cache, state, position, { flagged: !target.flagged })
     checkStatus()
   }
 
-  return { state, dashboard, reset, uncover, autoUncover, mark }
+  return { cache, state, dashboard, reset, uncover, autoUncover, mark }
 }

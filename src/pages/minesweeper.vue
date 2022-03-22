@@ -154,11 +154,11 @@ function resetGame(option: GameConfig | CreateGameOptions) {
       </div>
       <label flex="~ gap-1 col">
         Width: {{ customize.width }}
-        <input v-model.number="customize.width" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="50">
+        <input v-model.number="customize.width" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="30">
       </label>
       <label flex="~ gap-1 col">
         Height: {{ customize.height }}
-        <input v-model.number="customize.height" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="50">
+        <input v-model.number="customize.height" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="30">
       </label>
       <label flex="~ gap-1 col">
         Mines: {{ customizeMines }} ({{ customize.mines }}%)
@@ -199,5 +199,5 @@ function resetGame(option: GameConfig | CreateGameOptions) {
   - [v] 提示遊戲進行時間
   - [v] 保存遊戲狀態(Session Storage)
   - [v] 增加自定選項
-  - [ ] 優化記憶體使用
+  - [ ] 改善記憶體佔用
 -->
