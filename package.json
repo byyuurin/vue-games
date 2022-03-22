@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev:update": "npx taze -w && pnpm dev",
+    "dev:update": "npx taze && pnpm dev",
     "dev": "vite --port 80",
     "test": "vitest",
     "lint": "eslint \"src/**/*.{vue,ts,js}\"",
