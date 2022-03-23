@@ -165,7 +165,7 @@ function resetGame(option: GameConfig | CreateGameOptions) {
         </label>
         <label flex="~ gap-1 col">
           Mines: {{ customizeMines }} ({{ customize.mines }}%)
-          <input v-model.number="customize.mines" p="2" bg="gray-500/10" text="red-200" type="range" min="15" max="85">
+          <input v-model.number="customize.mines" p="2" bg="gray-500/10" text="red-200" type="range" min="15" max="80">
         </label>
         <label flex="~ gap-4" items-center>
           Friendly:
