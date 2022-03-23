@@ -1,4 +1,4 @@
-import { defineShortcuts, theme } from './_shared'
+import { defineShortcuts } from './utils'
 
 const extendButton = (appends: string) => `
 transition duration-100
@@ -7,9 +7,12 @@ disabled:cursor-default
 disabled:pointer-events-none
 ${appends}`
 
+
+const baseColor = 'teal'
+
 export default defineShortcuts([
   [
-    /^(?:btn|button)-solid(?:-(.*))?$/, ([, c = theme.primary]) =>
+    /^(?:btn|button)-solid(?:-(.*))?$/, ([, c = baseColor]) =>
       extendButton(`
         px-4 py-1 rounded
         text-{c}-600/100 dark:text-{c}-400/100
@@ -23,7 +26,7 @@ export default defineShortcuts([
       `.replace(/{c}/g, c))
   ],
   [
-    /^(?:btn|button)(?:-(.*))?$/, ([, c = theme.primary]) =>
+    /^(?:btn|button)(?:-(.*))?$/, ([, c = baseColor]) =>
       extendButton(`
         px-4 py-1 rounded
         text-{c}-50 dark:text-{c}-50
