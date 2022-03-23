@@ -106,15 +106,15 @@ function generateBoard(options: MaybeRef<CreateGameOptions>) {
       .map((_, x) => ({ position: { x, y }, counts: 0 } as MineBlock)))
 }
 
-function generateMines(cache: Ref<GameCache>, state: Ref<GameState>, exclude: MinePosition) {
+function generateMines(cache: Ref<GameCache>, state: Ref<GameState>, current: MinePosition) {
   const { options } = unref(state)
   const { width, height, mines, friendly = false } = options
   const maybes: MinePosition[] = []
+  const excludes = [current, ...( friendly ? nearbyPositions(current, options) : [])]
 
   const random = () => maybes.splice(Math.floor(Math.random() * maybes.length), 1)[0]
-  const safely = (p: MinePosition) =>
-    nearbyPositions(exclude, options).concat(exclude)
-      .filter(({ x, y }) => p.x === x && p.y === y).length > 0
+  const isExclude = (p: MinePosition) =>
+    excludes.filter(({ x, y }) => p.x === x && p.y === y).length > 0
 
   // 更新地雷格周圍八格的地雷計數
   const updateMineCounts = (center: MinePosition) => {
@@ -127,7 +127,7 @@ function generateMines(cache: Ref<GameCache>, state: Ref<GameState>, exclude: Mi
   // 建立所有可能出現地雷的座標
   for (let y = 0;y < height; y++) {
     for (let x = 0; x < width; x++)
-      if (!(friendly && safely({ x, y }))) maybes.push({ x, y })
+      if (!isExclude({ x, y })) maybes.push({ x, y })
   }
 
   let times = 0
