@@ -148,8 +148,8 @@ function resetGame(option: GameConfig | CreateGameOptions) {
       </div>
     </div>
 
-    <div v-show="customizeVisible" fixed top-0 left-0 z-20 w-full h-full bg="black/50" flex="~" justify-center items-center>
-      <div flex-grow max-w-screen-sm mx-4 p-4 rounded bg="gray-500/20">
+    <div v-show="customizeVisible" fixed top-0 left-0 z-20 w-full h-full bg="black/50 dark:black/90" flex="~" justify-center items-center select-none>
+      <div flex-grow max-w-screen-sm mx-4 p-4 rounded bg="white/90 dark:white/10">
         <div text-2xl leading="3em">
           Customize Settings
         </div>
