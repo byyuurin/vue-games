@@ -1,8 +1,5 @@
 html, body, #app {
-  @apply h-full min-h-full;
-
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  @apply h-full min-h-full antialiased;
 }
 
 body {

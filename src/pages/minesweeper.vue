@@ -91,12 +91,12 @@ function resetGame(option: GameConfig | CreateGameOptions) {
 </script>
 
 <template>
-  <div py-8>
-    <h2 text="5xl center ellipsis" mb-6 overflow-hidden>
+  <div pb-4 @contextmenu.capture="(e) => e.preventDefault()">
+    <h2 text="5xl center ellipsis" leading="2em" overflow-hidden>
       Minesweeper
     </h2>
 
-    <div flex="~ wrap gap-2" justify-center>
+    <div py-4 flex="~ wrap gap-2" justify-center>
       <button btn="~ sky" :disabled="!dashboard.started" @click="resetGame(state.options)">
         New Game
       </button>
@@ -113,10 +113,8 @@ function resetGame(option: GameConfig | CreateGameOptions) {
         Customize
       </button>
     </div>
-  </div>
 
-  <div text-center>
-    <div p-6 text="2xl black/75 dark:white/75" flex="~ gap-4" justify-center items-center>
+    <div text="2xl black/75 dark:white/75" flex="~ gap-4" justify-center items-center>
       <div flex="~ gap-1" justify-center items-center>
         <i i-mdi-clock-time-twelve-outline />
         <span>{{ timeAgo }}</span>
@@ -127,16 +125,20 @@ function resetGame(option: GameConfig | CreateGameOptions) {
         <span>{{ dashboard.unusedFlags }}</span>
       </div>
     </div>
-    <div relative inline-block max-w-full overflow-auto>
-      <div v-for="blocks, y of state.board" :key="y" flex="~ gap-0" justify-center>
-        <mine-block v-for="item, x of blocks" :key="x"
-                    v-bind="blockAttrs(item)"
-                    @click="game.uncover(item.position)"
-                    @dblclick="game.autoUncover(item.position)"
-                    @contextmenu.prevent="game.mark(item.position)"
-        />
+
+    <div relative p-4>
+      <div overflow-auto>
+        <div v-for="blocks, y of state.board" :key="y" flex="~ gap-0" justify-center>
+          <mine-block v-for="item, x of blocks" :key="x"
+                      flex-shrink-0
+                      v-bind="blockAttrs(item)"
+                      @click="game.uncover(item.position)"
+                      @dblclick="game.autoUncover(item.position)"
+                      @contextmenu.prevent="game.mark(item.position)"
+          />
+        </div>
       </div>
-      <div v-if="state.status" absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg="gray-50/50 dark:dark-50/50">
+      <div v-if="state.status" absolute top-0 bottom-0 left-0 right-0 flex justify-center items-center bg="gray-50/50 dark:dark-50/50">
         <span text="8xl shadow" select-none
               :class="{
                 'text-white/10 dark:text-white/20': state.status==='lose',
@@ -145,44 +147,45 @@ function resetGame(option: GameConfig | CreateGameOptions) {
         >{{ state.status.toUpperCase() }}</span>
       </div>
     </div>
-  </div>
 
-  <div v-show="customizeVisible" fixed top-0 left-0 z-20 w-full h-full bg="black/50" flex="~" justify-center items-center>
-    <div flex-grow max-w-screen-sm mx-4 p-4 rounded bg="gray-500/20">
-      <div text-2xl leading="3em">
-        Customize Settings
-      </div>
-      <label flex="~ gap-1 col">
-        Width: {{ customize.width }}
-        <input v-model.number="customize.width" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="30">
-      </label>
-      <label flex="~ gap-1 col">
-        Height: {{ customize.height }}
-        <input v-model.number="customize.height" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="30">
-      </label>
-      <label flex="~ gap-1 col">
-        Mines: {{ customizeMines }} ({{ customize.mines }}%)
-        <input v-model.number="customize.mines" p="2" bg="gray-500/10" text="red-200" type="range" min="15" max="85">
-      </label>
-      <label flex="~ gap-4" items-center>
-        Friendly:
-        <input v-model="customize.friendly" p="2" bg="gray-500/10" text="red-200" type="checkbox">
-      </label>
+    <div v-show="customizeVisible" fixed top-0 left-0 z-20 w-full h-full bg="black/50" flex="~" justify-center items-center>
+      <div flex-grow max-w-screen-sm mx-4 p-4 rounded bg="gray-500/20">
+        <div text-2xl leading="3em">
+          Customize Settings
+        </div>
+        <label flex="~ gap-1 col">
+          Width: {{ customize.width }}
+          <input v-model.number="customize.width" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="30">
+        </label>
+        <label flex="~ gap-1 col">
+          Height: {{ customize.height }}
+          <input v-model.number="customize.height" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="30">
+        </label>
+        <label flex="~ gap-1 col">
+          Mines: {{ customizeMines }} ({{ customize.mines }}%)
+          <input v-model.number="customize.mines" p="2" bg="gray-500/10" text="red-200" type="range" min="15" max="85">
+        </label>
+        <label flex="~ gap-4" items-center>
+          Friendly:
+          <input v-model="customize.friendly" p="2" bg="gray-500/10" text="red-200" type="checkbox">
+        </label>
 
-      <div py-8 flex="~ gap-4" justify-center>
-        <button btn="~ sky" @click="resetGame('customize')">
-          Confirm
-        </button>
-        <button btn="solid-sky" @click="customizeVisible=false">
-          Cancel
-        </button>
+        <div py-8 flex="~ gap-4" justify-center>
+          <button btn="~ sky" @click="resetGame('customize')">
+            Confirm
+          </button>
+          <button btn="solid-sky" @click="customizeVisible=false">
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <!--
-  學習參考: https://github.com/antfu/vue-minesweeper
+  學習參考1: https://github.com/antfu/vue-minesweeper
+  學習參考2: https://www.bilibili.com/video/BV1ia411b7jY/
 
   # 完成順序
   - [v] 基本參數與樣式
@@ -199,5 +202,5 @@ function resetGame(option: GameConfig | CreateGameOptions) {
   - [v] 提示遊戲進行時間
   - [v] 保存遊戲狀態(Session Storage)
   - [v] 增加自定選項
-  - [ ] 改善記憶體佔用
+  - [v] 改善記憶體佔用
 -->
