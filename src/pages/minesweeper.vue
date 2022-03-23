@@ -127,15 +127,17 @@ function resetGame(option: GameConfig | CreateGameOptions) {
     </div>
 
     <div relative p-4>
-      <div overflow-auto>
-        <div v-for="blocks, y of state.board" :key="y" flex="~ gap-0" justify-center>
-          <mine-block v-for="item, x of blocks" :key="x"
-                      flex-shrink-0
-                      v-bind="blockAttrs(item)"
-                      @click="game.uncover(item.position)"
-                      @dblclick="game.autoUncover(item.position)"
-                      @contextmenu.prevent="game.mark(item.position)"
-          />
+      <div container m-auto text-center overflow-auto>
+        <div inline-block>
+          <div v-for="blocks, y of state.board" :key="y" w-auto m-auto flex items-center>
+            <mine-block v-for="item, x of blocks" :key="x"
+                        flex-shrink-0
+                        v-bind="blockAttrs(item)"
+                        @click="game.uncover(item.position)"
+                        @dblclick="game.autoUncover(item.position)"
+                        @contextmenu.prevent="game.mark(item.position)"
+            />
+          </div>
         </div>
       </div>
       <div v-if="state.status" absolute top-0 bottom-0 left-0 right-0 flex justify-center items-center bg="gray-50/50 dark:dark-50/50">
@@ -203,4 +205,5 @@ function resetGame(option: GameConfig | CreateGameOptions) {
   - [v] 保存遊戲狀態(Session Storage)
   - [v] 增加自定選項
   - [v] 改善記憶體佔用
+  - [v] 修正捲軸出現後內容缺失情況
 -->
