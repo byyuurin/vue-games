@@ -5,7 +5,7 @@
 declare module 'vue' {
   export interface GlobalComponents {
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
-    MineBlock: typeof import('./components/MineBlock.vue')['default']
+    MineCell: typeof import('./components/MineCell.vue')['default']
     PageHeader: typeof import('./components/PageHeader.vue')['default']
     ToggleTheme: typeof import('./components/ToggleTheme.vue')['default']
   }

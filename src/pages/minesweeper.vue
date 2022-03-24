@@ -5,7 +5,7 @@ meta:
 
 <script lang="ts" setup>
 import { breakpoints } from '../composables/shared'
-import type { CreateGameOptions, MineBlock } from '../composables/minesweeper'
+import type { BoardCell, CreateGameOptions } from '../composables/minesweeper'
 import { createGame } from '../composables/minesweeper'
 
 const helpVisible = ref(true)
@@ -54,8 +54,8 @@ const timeAgo = computed(() => {
   return (diff / 1000).toFixed(2).split('.')
 })
 
-function blockAttrs(item: MineBlock) {
-  const { counts, dangered, flagged, viewed, disabled } = item
+function cellAttrs(cell: BoardCell) {
+  const { counts, dangered, flagged, viewed, disabled } = cell
   return { counts, dangered, flagged, viewed, disabled }
 }
 
@@ -181,13 +181,13 @@ function resetGame(option: GameConfig | CreateGameOptions) {
     <div relative p-6>
       <div container m-auto text-center overflow-auto>
         <div inline-block>
-          <div v-for="blocks, y of state.board" :key="y" w-auto m-auto flex items-center>
-            <mine-block v-for="item, x of blocks" :key="x"
-                        flex-shrink-0
-                        v-bind="blockAttrs(item)"
-                        @click="game.uncover(item.position)"
-                        @dblclick="game.autoUncover(item.position)"
-                        @contextmenu.prevent="game.mark(item.position)"
+          <div v-for="cells, y of state.board" :key="y" w-auto m-auto flex items-center>
+            <mine-cell v-for="cell, x of cells" :key="x"
+                       flex-shrink-0
+                       v-bind="cellAttrs(cell)"
+                       @click="game.uncover(cell.position)"
+                       @dblclick="game.autoUncover(cell.position)"
+                       @contextmenu.prevent="game.mark(cell.position)"
             />
           </div>
         </div>

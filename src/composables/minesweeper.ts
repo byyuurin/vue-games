@@ -2,13 +2,13 @@ import type { Ref } from 'vue'
 import type { MaybeRef } from '@vueuse/core'
 import { createRandom } from './shared/utils'
 
-interface MinePosition {
+interface CellPosition {
   x: number
   y: number
 }
 
-export interface MineBlock {
-  position: MinePosition
+export interface BoardCell {
+  position: CellPosition
   counts: number
   dangered?: boolean
   flagged?: boolean
@@ -40,10 +40,10 @@ interface GameState {
   }
   options: CreateGameOptions
   status: GameStatus | null
-  board: MineBlock[][]
+  board: BoardCell[][]
 }
 
-function updateGameCache(cache: Ref<GameCache>, target: MineBlock, diff: Partial<MineBlock>) {
+function updateGameCache(cache: Ref<GameCache>, target: BoardCell, diff: Partial<BoardCell>) {
   let { flags, dangers, unknowns } = unref(cache)
 
   // toggle flag
@@ -62,7 +62,7 @@ function updateGameCache(cache: Ref<GameCache>, target: MineBlock, diff: Partial
   cache.value = { ...unref(cache), flags, dangers, unknowns }
 }
 
-function updateBlock(cache: Ref<GameCache> | null, state: Ref<GameState>, position: MinePosition, diff: Partial<MineBlock>) {
+function updateCell(cache: Ref<GameCache> | null, state: Ref<GameState>, position: CellPosition, diff: Partial<BoardCell>) {
   const { x, y } = position
   const raw = state.value.board[y][x]
 
@@ -71,7 +71,7 @@ function updateBlock(cache: Ref<GameCache> | null, state: Ref<GameState>, positi
   state.value.board[y][x] = { ...raw, ...diff }
 }
 
-function nearbyPositions(center: MinePosition, options: MaybeRef<CreateGameOptions>) {
+function nearbyPositions(center: CellPosition, options: MaybeRef<CreateGameOptions>) {
   const { width, height } = unref(options)
   const directions = [
     [1, 1], [1, 0], [1, -1],
@@ -84,20 +84,20 @@ function nearbyPositions(center: MinePosition, options: MaybeRef<CreateGameOptio
   })).filter(({ x, y }) => x >= 0 && x < width && y >= 0 && y < height)
 }
 
-function expandBlocks(cache: Ref<GameCache>, state: Ref<GameState>, current: MineBlock) {
+function expandCells(cache: Ref<GameCache>, state: Ref<GameState>, current: BoardCell) {
   const { options } = unref(state)
   // 不處理已展開區塊
   if (current.viewed) return
 
   // 不處理地雷或已標記區塊
   if (!current.dangered && !current.flagged)
-    updateBlock(cache, state, current.position, { viewed: true })
+    updateCell(cache, state, current.position, { viewed: true })
 
   // 周圍無地雷的區塊可繼續展開
   if (current.counts === 0) {
     nearbyPositions(current.position, options).forEach((position) => {
       const target = state.value.board[position.y][position.x]
-      expandBlocks(cache, state, target)
+      expandCells(cache, state, target)
     })
   }
 }
@@ -106,25 +106,25 @@ function generateBoard(options: MaybeRef<CreateGameOptions>) {
   const { width, height } = unref(options)
   return Array.from({ length: height })
     .map((_, y) => Array.from({ length: width })
-      .map((_, x) => ({ position: { x, y }, counts: 0 } as MineBlock)))
+      .map((_, x) => ({ position: { x, y }, counts: 0 } as BoardCell)))
 }
 
-function generateMines(cache: Ref<GameCache>, state: Ref<GameState>, current: MinePosition) {
+function generateMines(cache: Ref<GameCache>, state: Ref<GameState>, current: CellPosition) {
   const { options } = unref(state)
   const { width, height, mines, friendly = false } = options
-  const maybes: MinePosition[] = []
+  const maybes: CellPosition[] = []
   const excludes = [current, ...( friendly ? nearbyPositions(current, options) : [])]
   const random = createRandom(cache.value.seed)
 
   const randomPosition = () => maybes.splice(Math.floor(random() * maybes.length), 1)[0]
-  const isExclude = (p: MinePosition) =>
+  const isExclude = (p: CellPosition) =>
     excludes.filter(({ x, y }) => p.x === x && p.y === y).length > 0
 
   // 更新地雷格周圍八格的地雷計數
-  const updateMineCounts = (center: MinePosition) => {
+  const updateMineCounts = (center: CellPosition) => {
     nearbyPositions(center, options).forEach((position) => {
       const { counts } = state.value.board[position.y][position.x]
-      updateBlock(null, state, position, { counts: counts + 1 })
+      updateCell(null, state, position, { counts: counts + 1 })
     })
   }
 
@@ -138,7 +138,7 @@ function generateMines(cache: Ref<GameCache>, state: Ref<GameState>, current: Mi
   while (times < mines) {
     const position = randomPosition()
 
-    updateBlock(cache, state, position, { dangered: true })
+    updateCell(cache, state, position, { dangered: true })
     updateMineCounts(position)
 
     times++
@@ -186,7 +186,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
     }
   })
 
-  const find = (position: MinePosition) => unref(state).board[position.y][position.x]
+  const find = (position: CellPosition) => unref(state).board[position.y][position.x]
 
   /**
    * 重置遊戲
@@ -232,7 +232,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
    * 展開內容
    * @param position 座標
    */
-  const uncover = (position: MinePosition) => {
+  const uncover = (position: CellPosition) => {
     if (!dashboard.value.started) {
       generateMines(cache, state, position)
       state.value.timestamp.begin = Date.now()
@@ -244,7 +244,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
     if (target.flagged) return
     if (target.dangered) return stop('lose')
 
-    expandBlocks(cache, state, target)
+    expandCells(cache, state, target)
     checkStatus()
   }
 
@@ -252,22 +252,22 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
    * 自動展開
    * @param position 座標
    */
-  const autoUncover = (position: MinePosition) => {
+  const autoUncover = (position: CellPosition) => {
     const { options } = unref(state)
     const target = find(position)
 
     if (state.value.status) return
     if (!target.viewed) return
 
-    const nearbyBlocks = nearbyPositions(target.position, options).map((position) => find(position))
+    const nearbyCells = nearbyPositions(target.position, options).map((position) => find(position))
     let dangerCounts = 0
 
-    nearbyBlocks.forEach((item) => {
+    nearbyCells.forEach((item) => {
       if (item.dangered && !item.flagged) dangerCounts++
     })
 
     if (dangerCounts === 0)
-      nearbyBlocks.forEach((block) => expandBlocks(cache, state, block))
+      nearbyCells.forEach((cell) => expandCells(cache, state, cell))
 
     checkStatus()
   }
@@ -276,7 +276,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
    * 標記(插旗)
    * @param position 座標
    */
-  const mark = (position: MinePosition) => {
+  const mark = (position: CellPosition) => {
     const { mines } = unref(state).options
     const target = find(position)
 
@@ -284,7 +284,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
     if (target.viewed) return
     if (dashboard.value.flags >= mines && !target.flagged) return
 
-    updateBlock(cache, state, position, { flagged: !target.flagged })
+    updateCell(cache, state, position, { flagged: !target.flagged })
     checkStatus()
   }
 
