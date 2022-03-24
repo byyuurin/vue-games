@@ -1,5 +1,6 @@
 import type { Ref } from 'vue'
 import type { MaybeRef } from '@vueuse/core'
+import { createRandom } from './shared/utils'
 
 interface MinePosition {
   x: number
@@ -20,9 +21,11 @@ export interface CreateGameOptions {
   height: number
   mines: number
   friendly?: boolean
+  seed?: string
 }
 
 interface GameCache {
+  seed?: string
   flags: number
   dangers: number
   unknowns: number
@@ -56,7 +59,7 @@ function updateGameCache(cache: Ref<GameCache>, target: MineBlock, diff: Partial
   // generate mines
   if ('dangered' in diff) dangers += diff.dangered ? 1 : -1
 
-  cache.value = { flags, dangers, unknowns }
+  cache.value = { ...unref(cache), flags, dangers, unknowns }
 }
 
 function updateBlock(cache: Ref<GameCache> | null, state: Ref<GameState>, position: MinePosition, diff: Partial<MineBlock>) {
@@ -111,8 +114,9 @@ function generateMines(cache: Ref<GameCache>, state: Ref<GameState>, current: Mi
   const { width, height, mines, friendly = false } = options
   const maybes: MinePosition[] = []
   const excludes = [current, ...( friendly ? nearbyPositions(current, options) : [])]
+  const random = createRandom(cache.value.seed)
 
-  const random = () => maybes.splice(Math.floor(Math.random() * maybes.length), 1)[0]
+  const randomPosition = () => maybes.splice(Math.floor(random() * maybes.length), 1)[0]
   const isExclude = (p: MinePosition) =>
     excludes.filter(({ x, y }) => p.x === x && p.y === y).length > 0
 
@@ -132,7 +136,7 @@ function generateMines(cache: Ref<GameCache>, state: Ref<GameState>, current: Mi
 
   let times = 0
   while (times < mines) {
-    const position = random()
+    const position = randomPosition()
 
     updateBlock(cache, state, position, { dangered: true })
     updateMineCounts(position)
@@ -155,6 +159,7 @@ function createGameCache(state: GameState) {
   }))
 
   return ref<GameCache>({
+    seed: options.seed,
     flags,
     dangers,
     unknowns
@@ -189,6 +194,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
   const reset = () => {
     const { width, height } = unref(gameOptions)
     cache.value = {
+      ...unref(cache),
       dangers: 0,
       flags: 0,
       unknowns: width * height

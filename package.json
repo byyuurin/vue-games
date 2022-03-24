@@ -15,12 +15,14 @@
   "dependencies": {
     "@vueuse/core": "^8.1.2",
     "@vueuse/head": "^0.7.5",
+    "seedrandom": "^3.0.5",
     "vue": "^3.2.31",
     "vue-router": "^4.0.14"
   },
   "devDependencies": {
     "@byyuurin/eslint-config": "^0.4.1",
     "@iconify/json": "^2.1.18",
+    "@types/seedrandom": "^3.0.2",
     "@unocss/reset": "^0.29.5",
     "@unocss/transformer-directives": "^0.29.5",
     "@vitejs/plugin-vue": "^2.2.4",
