@@ -2,13 +2,14 @@
 import { isDev } from '/src/composables/shared'
 
 interface Props {
+  position: { x: number; y: number }
   counts?: number
   dangered?: boolean
   flagged?: boolean
   viewed?: boolean
   disabled?: boolean
 }
-const props = withDefaults(defineProps<Props>(), { counts: 0 })
+const props = withDefaults(defineProps<Props>(), { counts: 0, position: () => ({ x: 0, y: 0 }) })
 
 const statusClasses = computed(() => {
   const result: string[] = []

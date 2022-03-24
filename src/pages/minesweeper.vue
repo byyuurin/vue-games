@@ -5,27 +5,23 @@ meta:
 
 <script lang="ts" setup>
 import { breakpoints } from '../composables/shared'
-import type { BoardCell, CreateGameOptions } from '../composables/minesweeper'
+import type { CreateGameOptions } from '../composables/minesweeper'
 import { createGame } from '../composables/minesweeper'
 
 const helpVisible = ref(true)
 const helpEl = ref<HTMLDivElement|null>(null)
 const help = useDraggable(helpEl, { initialValue: { x: 200, y: 400 } })
 
-const config = computed(() => {
-  const result = {
-    easy: { width: 8, height: 8, mines: 10 },
-    medium: { width: 16, height: 16, mines: 40 },
-    hard: { width: 30, height: 16, mines: 99 }
-  }
+const config = {
+  easy: { width: 8, height: 8, mines: 10 },
+  medium: { width: 16, height: 16, mines: 40 },
+  hard: { width: 30, height: 16, mines: 99 }
+}
 
-  return result
-})
-
-type GameConfig = keyof typeof config.value | 'customize'
+type GameConfig = keyof typeof config | 'customize'
 
 const gameOptions = ref<CreateGameOptions>({
-  ...unref(config)['easy'],
+  ...config['easy'],
   friendly: true
 })
 const game = createGame(gameOptions)
@@ -39,25 +35,6 @@ const customizeMines = computed(() => {
   const { width, height, mines } = unref(customize)
   return Math.round(width * height * mines / 100)
 })
-const now = useNow()
-const timeAgo = computed(() => {
-  const { begin, end } = state.value.timestamp
-  let diff = 0
-
-  if (begin && end)
-    diff = end - begin
-
-  if (begin && !end)
-    diff = +now.value - begin
-
-
-  return (diff / 1000).toFixed(2).split('.')
-})
-
-function cellAttrs(cell: BoardCell) {
-  const { counts, dangered, flagged, viewed, disabled } = cell
-  return { counts, dangered, flagged, viewed, disabled }
-}
 
 function resetGame(option: GameConfig | CreateGameOptions) {
   const { friendly } = unref(gameOptions)
@@ -68,7 +45,7 @@ function resetGame(option: GameConfig | CreateGameOptions) {
     case 'easy':
     case 'medium':
     case 'hard':
-      options = { ...unref(config)[option], friendly }
+      options = { ...config[option], friendly }
       break
     case 'customize':
       options = {
@@ -114,9 +91,10 @@ function resetGame(option: GameConfig | CreateGameOptions) {
              flex="~ gap-2" justify-between items-center
         >
           <span>How to play</span>
-          <button icon-button i-maki-cross text-2xl
-                  xl="top-5 right-4"
-                  @click="helpVisible = false"
+          <button
+            i-maki-cross icon-button text-2xl
+            xl="top-5 right-4"
+            @click="helpVisible = false"
           />
         </div>
         <div p-4 grid="~ cols-3 gap-x-8 gap-y-4" auto-cols-auto items-center>
@@ -163,44 +141,19 @@ function resetGame(option: GameConfig | CreateGameOptions) {
       </button>
     </div>
 
-    <div text="2xl black/75 dark:white/75" flex="~ gap-4" justify-center items-center>
-      <div flex="~ gap-1" justify-center items-center>
-        <i i-mdi-clock-time-twelve-outline />
-        <div>
-          <span>{{ timeAgo[0] }}</span>
-          <span text-lg self-end>.{{ timeAgo[1] }}</span>
-        </div>
-      </div>
+    <mine-info
+      :begin="state.timestamp.begin"
+      :end="state.timestamp.end"
+      :unused-flags="dashboard.unusedFlags"
+    />
 
-      <div flex="~ gap-1" justify-center items-center>
-        <i i-mdi-mine />
-        <div>{{ dashboard.unusedFlags }}</div>
-      </div>
-    </div>
-
-    <div relative p-6>
-      <div container m-auto text-center overflow-auto>
-        <div inline-block>
-          <div v-for="cells, y of state.board" :key="y" w-auto m-auto flex items-center>
-            <mine-cell v-for="cell, x of cells" :key="x"
-                       flex-shrink-0
-                       v-bind="cellAttrs(cell)"
-                       @click="game.uncover(cell.position)"
-                       @dblclick="game.autoUncover(cell.position)"
-                       @contextmenu.prevent="game.mark(cell.position)"
-            />
-          </div>
-        </div>
-      </div>
-      <div v-if="state.status" absolute top-0 bottom-0 left-0 right-0 flex justify-center items-center bg="gray-50/50 dark:dark-50/50">
-        <span text="8xl shadow" select-none
-              :class="{
-                'text-white/10 dark:text-white/20': state.status==='lose',
-                'text-orange-400/50 dark:text-orange-400/50': state.status==='win',
-              }"
-        >{{ state.status.toUpperCase() }}</span>
-      </div>
-    </div>
+    <mine-board
+      :status="state.status"
+      :board="state.board"
+      @click="game.uncover"
+      @dblclick="game.autoUncover"
+      @contextmenu="game.mark"
+    />
 
     <div v-show="customizeVisible" fixed top-0 left-0 z-20 w-full h-full bg="black/50 dark:black/90" flex="~" justify-center items-center select-none>
       <div flex-grow max-w-screen-sm mx-4 p-4 rounded bg="white/90 dark:white/10">
@@ -259,4 +212,5 @@ function resetGame(option: GameConfig | CreateGameOptions) {
   - [v] 改善記憶體佔用
   - [v] 修正捲軸出現後內容缺失情況
   - [v] 操作說明提示
+  - [v] 組件拆分
 -->

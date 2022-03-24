@@ -2,7 +2,7 @@ import type { Ref } from 'vue'
 import type { MaybeRef } from '@vueuse/core'
 import { createRandom } from './shared/utils'
 
-interface CellPosition {
+export interface CellPosition {
   x: number
   y: number
 }
