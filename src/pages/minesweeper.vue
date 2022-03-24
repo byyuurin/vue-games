@@ -8,6 +8,10 @@ import { breakpoints } from '../composables/shared'
 import type { CreateGameOptions, MineBlock } from '../composables/minesweeper'
 import { createGame } from '../composables/minesweeper'
 
+const helpVisible = ref(true)
+const helpEl = ref<HTMLDivElement|null>(null)
+const help = useDraggable(helpEl, { initialValue: { x: 200, y: 400 } })
+
 const config = computed(() => {
   const result = {
     easy: { width: 8, height: 8, mines: 10 },
@@ -47,7 +51,7 @@ const timeAgo = computed(() => {
     diff = +now.value - begin
 
 
-  return (diff / 1000).toFixed(1)
+  return (diff / 1000).toFixed(2).split('.')
 })
 
 function blockAttrs(item: MineBlock) {
@@ -96,6 +100,51 @@ function resetGame(option: GameConfig | CreateGameOptions) {
       Minesweeper
     </h2>
 
+    <div v-show="helpVisible" ref="helpEl"
+         relative m-auto p-4
+         xl="fixed z-5 p-0"
+         :style="!breakpoints.xl.value ? '' : help.style.value"
+    >
+      <div whitespace-nowrap select-none rounded
+           bg="sky-500 opacity-10 dark:opacity-25"
+           xl="cursor-move opacity-80 hover:opacity-100 transition duration-250"
+      >
+        <div p-4 text-2xl font-bold
+             bg="dark/10 dark:black/20"
+             flex="~ gap-2" justify-between items-center
+        >
+          <span>How to play</span>
+          <button icon-button i-maki-cross text-2xl
+                  xl="top-5 right-4"
+                  @click="helpVisible = false"
+          />
+        </div>
+        <div p-4 grid="~ cols-3 gap-x-8 gap-y-4" auto-cols-auto items-center>
+          <p col-span-2>
+            Uncover
+          </p>
+          <div flex items-center children:flex-shrink-0>
+            <i i-iconoir-mouse-button-left text="2xl" />
+          </div>
+
+          <p col-span-2>
+            Uncover (conditional)
+          </p>
+          <div flex items-center children:flex-shrink-0>
+            <i i-iconoir-mouse-button-left text="2xl" />
+            <i i-iconoir-mouse-button-left text="2xl" />
+          </div>
+
+          <p col-span-2>
+            Flagging
+          </p>
+          <div flex items-center children:flex-shrink-0>
+            <i i-iconoir-mouse-button-right text="2xl" />
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div py-4 flex="~ wrap gap-2" justify-center>
       <button btn="~ sky" :disabled="!dashboard.started" @click="resetGame(state.options)">
         New Game
@@ -117,16 +166,19 @@ function resetGame(option: GameConfig | CreateGameOptions) {
     <div text="2xl black/75 dark:white/75" flex="~ gap-4" justify-center items-center>
       <div flex="~ gap-1" justify-center items-center>
         <i i-mdi-clock-time-twelve-outline />
-        <span>{{ timeAgo }}</span>
+        <div>
+          <span>{{ timeAgo[0] }}</span>
+          <span text-lg self-end>.{{ timeAgo[1] }}</span>
+        </div>
       </div>
 
       <div flex="~ gap-1" justify-center items-center>
         <i i-mdi-mine />
-        <span>{{ dashboard.unusedFlags }}</span>
+        <div>{{ dashboard.unusedFlags }}</div>
       </div>
     </div>
 
-    <div relative p-4>
+    <div relative p-6>
       <div container m-auto text-center overflow-auto>
         <div inline-block>
           <div v-for="blocks, y of state.board" :key="y" w-auto m-auto flex items-center>
@@ -206,4 +258,5 @@ function resetGame(option: GameConfig | CreateGameOptions) {
   - [v] 增加自定選項
   - [v] 改善記憶體佔用
   - [v] 修正捲軸出現後內容缺失情況
+  - [v] 操作說明提示
 -->
