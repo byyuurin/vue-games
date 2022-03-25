@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { isDev } from '/src/composables/shared'
+import type { CellPosition } from '../../composables/minesweeper'
 
 interface Props {
-  position: { x: number; y: number }
+  position: CellPosition
   counts?: number
   dangered?: boolean
   flagged?: boolean
