@@ -72,7 +72,7 @@ function resetGame(option: GameConfig | CreateGameOptions) {
 </script>
 
 <template>
-  <div pb-4 @contextmenu.capture="(e) => e.preventDefault()">
+  <div pb-4>
     <h2 text="5xl center ellipsis" leading="2em" overflow-hidden>
       Minesweeper
     </h2>

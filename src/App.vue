@@ -11,7 +11,7 @@ watch(() => route.meta, (meta) => {
 </script>
 
 <template>
-  <div font-sans flex="~ col" h-full overflow-auto>
+  <div font-sans flex="~ col" h-full overflow-auto @contextmenu.capture="(e) => e.preventDefault()">
     <page-header />
     <div flex="grow">
       <div w-full min-h-full>
