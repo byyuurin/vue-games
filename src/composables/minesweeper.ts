@@ -118,7 +118,7 @@ function generateMines(cache: Ref<GameCache>, state: Ref<GameState>, current: Ce
 
   const randomPosition = () => maybes.splice(Math.floor(random() * maybes.length), 1)[0]
   const isExclude = (p: CellPosition) =>
-    excludes.filter(({ x, y }) => p.x === x && p.y === y).length > 0
+    excludes.some(({ x, y }) => p.x === x && p.y === y)
 
   // 更新地雷格周圍八格的地雷計數
   const updateMineCounts = (center: CellPosition) => {
