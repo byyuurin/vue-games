@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { breakpoints } from '/src/composables/shared'
 import type { CellPosition, GameState } from '/src/composables/n-puzzle'
 import { isComplete, isLoading } from '/src/composables/n-puzzle'
 
@@ -20,6 +21,8 @@ interface Emit {
 
 const emit = defineEmits<Emit>()
 
+const el = ref<HTMLDivElement|null>(null)
+const imageMaxWidth = ref(props.size)
 const size = ref({
   width: props.size,
   height: props.size,
@@ -30,6 +33,7 @@ const style = computed(() => {
   const { width, height, gaps } = unref(size)
   const { columns } = props.state.options
   return `
+    --fetch-width: ${imageMaxWidth.value}px;
     --puzzle-width: ${width * columns + (columns - 1) * gaps}px;
     --cell-width: ${width}px;
     --cell-height: ${height}px;
@@ -37,43 +41,38 @@ const style = computed(() => {
   `
 })
 
-watch(()=> props.src, () => {
-  isLoading.value = true
-})
+function init() {
+  const { columns, gaps } = props.state.options
+  imageMaxWidth.value = breakpoints.md.value
+    ? props.size
+    : Math.floor((el.value!.offsetWidth - (columns - 1) * gaps) / columns)
+}
 
 function handleLoadSuccess(e: Event) {
-  const { columns, rows } = props.state.options
-  const el = e.target as HTMLImageElement
-  const ceil = (n: number) => Math.ceil(n)
-
-  const box = {
-    scale: 1.0,
-    width: el.width / columns,
-    height: el.height / rows
-  }
-
-  if (box.width < box.height && box.width < props.size)
-    box.scale = props.size / box.width
-
-  if (box.height < box.width && box.height < props.size)
-    box.scale = props.size / box.height
-
+  const { width, height } = e.target as HTMLImageElement
 
   size.value = {
     ...unref(size),
-    width: ceil(box.width * box.scale),
-    height: ceil(box.height * box.scale)
+    width,
+    height
   }
 
   nextTick(()=> {
     isLoading.value = false
   })
 }
+
+watch(()=> props.src, () => {
+  init()
+  isLoading.value = true
+})
+
+useResizeObserver(el, init)
 </script>
 
 <template>
   <div relative p-6 :style="style">
-    <div text-center overflow-auto select-none>
+    <div ref="el" text-center overflow-auto select-none>
       <div inline-block>
         <div flex="~ gap-$cell-gap wrap"
              w="$puzzle-width"
@@ -93,7 +92,9 @@ function handleLoadSuccess(e: Event) {
           </puzzle-cell>
         </div>
         <img
-          v-if="isLoading && src" z="-9999" fixed invisible w-100px h-auto :src="src"
+          v-if="isLoading && src"
+          z="-9999" fixed invisible h-auto :src="src"
+          class="w-$fetch-width"
           @load="handleLoadSuccess"
         >
       </div>
