@@ -9,6 +9,9 @@ declare module 'vue' {
     MineBoard: typeof import('./components/minesweeper/MineBoard.vue')['default']
     MineCell: typeof import('./components/minesweeper/MineCell.vue')['default']
     MineInfo: typeof import('./components/minesweeper/MineInfo.vue')['default']
+    PuzzleBoard: typeof import('./components/n-puzzle/PuzzleBoard.vue')['default']
+    PuzzleCell: typeof import('./components/n-puzzle/PuzzleCell.vue')['default']
+    PuzzleInfo: typeof import('./components/n-puzzle/PuzzleInfo.vue')['default']
     ToggleTheme: typeof import('./components/ToggleTheme.vue')['default']
   }
 }
