@@ -154,11 +154,12 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
   })
 
   const reset = () => {
-    current = { x: 0, y: unref(gameOptions).rows - 1 }
+    const { options } = unref(state)
+    current = { x: 0, y: options.rows - 1 }
     state.value = {
       timestamp: { begin: 0, end: 0 },
-      options: unref(gameOptions),
-      board: generateBoard(unref(gameOptions), current),
+      options,
+      board: generateBoard(options, current),
       steps: 0
     }
   }

@@ -7,9 +7,9 @@ meta:
 import type { CreateGameOptions } from '/src/composables/n-puzzle'
 import { createGame, isComplete, isLoading }from '/src/composables/n-puzzle'
 const config = {
-  easy: { columns: 2, rows: 2 },
-  medium: { columns: 3, rows: 3 },
-  hard: { columns: 4, rows: 4 }
+  easy: { columns: 3, rows: 3 },
+  medium: { columns: 4, rows: 4 },
+  hard: { columns: 5, rows: 5 }
 }
 const images = [
   'https://cdn.discordapp.com/attachments/757420273350868993/957120284085866516/LINE_ALBUM_300_220309_111.jpg',
@@ -19,8 +19,7 @@ const images = [
 ]
 const randomImage = () => images[Math.floor(Math.random() * images.length)]
 type GameConfig = keyof typeof config | 'customize'
-const gameOptions = ref<CreateGameOptions>({ ...config['easy'], gaps: 1, background: randomImage() })
-const game = createGame(gameOptions)
+const game = createGame({ ...config.easy, gaps: 1, background: randomImage() })
 const { state } = game
 const customizeVisible = ref(false)
 const customize = ref({
@@ -39,14 +38,14 @@ function resetGame(option: GameConfig | CreateGameOptions) {
     case 'medium':
     case 'hard':
       options = {
-        ...unref(gameOptions),
+        ...unref(state).options,
         ...config[option],
         background: randomImage()
       }
       break
     case 'customize':
       options = {
-        ...unref(gameOptions),
+        ...unref(state).options,
         columns: customize.value.columns,
         rows: customize.value.rows,
         background: customize.value.url || customize.value.background
@@ -58,14 +57,14 @@ function resetGame(option: GameConfig | CreateGameOptions) {
 
   isLoading.value = true
   customizeVisible.value = false
-  gameOptions.value = options
+  state.value.options = options
   game.reset()
 }
 
-function beforeCustoize() {
+function beforeCustomize() {
   customize.value = {
     background: '',
-    ...unref(gameOptions),
+    ...unref(state).options,
     url: ''
   }
   customizeVisible.value = true
@@ -91,7 +90,7 @@ function beforeCustoize() {
       <button btn @click="resetGame('hard')">
         Hard
       </button>
-      <button btn @click="beforeCustoize">
+      <button btn @click="beforeCustomize">
         Customize
       </button>
     </div>
