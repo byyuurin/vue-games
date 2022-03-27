@@ -72,32 +72,31 @@ function handleLoadSuccess(e: Event) {
 </script>
 
 <template>
-  <div text-center p-6>
-    <div
-      relative inline-block overflow-auto select-none
-      :style="style"
-    >
-      <div flex="~ gap-$cell-gap wrap"
-           w="$puzzle-width"
-           text="4xl dark/20 dark:white/20"
-           bg="gray-500/10"
-           rounded overflow-hidden
-      >
-        <puzzle-cell
-          v-for="cell, i in state.board"
-          :key="i" v-bind="cell" :reversed="reversed"
-          w="$cell-width" h="$cell-height"
-          @click="emit('click', cell.position)"
+  <div relative p-6 :style="style">
+    <div text-center overflow-auto select-none>
+      <div inline-block>
+        <div flex="~ gap-$cell-gap wrap"
+             w="$puzzle-width"
+             text="4xl dark/20 dark:white/20"
+             bg="gray-500/10"
+             rounded overflow-hidden
         >
-          <template v-if="!isLoading && src" #default>
-            <img w-full object-cover :src="src">
-          </template>
-        </puzzle-cell>
+          <puzzle-cell
+            v-for="cell, i in state.board"
+            :key="i" v-bind="cell" :reversed="reversed"
+            w="$cell-width" h="$cell-height"
+            @click="emit('click', cell.position)"
+          >
+            <template v-if="!isLoading && src" #default>
+              <img w-full object-cover :src="src">
+            </template>
+          </puzzle-cell>
+        </div>
+        <img
+          v-if="isLoading && src" z="-9999" fixed invisible w-100px h-auto :src="src"
+          @load="handleLoadSuccess"
+        >
       </div>
-      <img
-        v-if="isLoading && src" z="-9999" fixed invisible w-100px h-auto :src="src"
-        @load="handleLoadSuccess"
-      >
     </div>
   </div>
 </template>
