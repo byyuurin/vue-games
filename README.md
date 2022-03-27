@@ -5,7 +5,7 @@ Some tiny games clone in Vue 3
 ## Game List
 
 - [Minesweeper](https://byyuurin.github.io/vue-games/minesweeper)
-- N-Puzzle
+- [N-Puzzle](https://byyuurin.github.io/vue-games/n-puzzle)
 
 
 <summary>
