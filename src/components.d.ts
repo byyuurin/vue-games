@@ -4,11 +4,11 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AppHeader: typeof import('./components/AppHeader.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     MineBoard: typeof import('./components/minesweeper/MineBoard.vue')['default']
     MineCell: typeof import('./components/minesweeper/MineCell.vue')['default']
     MineInfo: typeof import('./components/minesweeper/MineInfo.vue')['default']
-    PageHeader: typeof import('./components/PageHeader.vue')['default']
     ToggleTheme: typeof import('./components/ToggleTheme.vue')['default']
   }
 }
