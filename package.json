@@ -6,14 +6,14 @@
     "dev:update": "npx taze && pnpm dev",
     "dev": "vite --port 80",
     "test": "vitest",
-    "lint": "eslint \"src/**/*.{vue,ts,js}\"",
-    "lint:fix": "eslint \"src/**/*.{vue,ts,js}\" --fix",
+    "lint": "eslint \"**/*.{vue,ts,js}\"",
+    "lint:fix": "eslint \"**/*.{vue,ts,js}\" --fix",
     "build": "vite build",
     "typecheck": "vue-tsc --noEmit",
     "preview": "vite preview --port 80"
   },
   "dependencies": {
-    "@vueuse/core": "^8.1.2",
+    "@vueuse/core": "^8.2.0",
     "@vueuse/head": "^0.7.5",
     "seedrandom": "^3.0.5",
     "vue": "^3.2.31",
@@ -21,19 +21,19 @@
   },
   "devDependencies": {
     "@byyuurin/eslint-config": "^0.4.1",
-    "@iconify/json": "^2.1.18",
+    "@iconify/json": "^2.1.20",
     "@types/seedrandom": "^3.0.2",
-    "@unocss/reset": "^0.29.5",
-    "@unocss/transformer-directives": "^0.29.5",
+    "@unocss/reset": "^0.29.6",
+    "@unocss/transformer-directives": "^0.29.6",
     "@vitejs/plugin-vue": "^2.2.4",
-    "eslint": "^8.11.0",
-    "typescript": "^4.6.2",
-    "unocss": "^0.29.5",
+    "eslint": "^8.12.0",
+    "typescript": "^4.6.3",
+    "unocss": "^0.29.6",
     "unplugin-auto-import": "^0.6.6",
-    "unplugin-vue-components": "^0.18.3",
-    "vite": "^2.9.0-beta.6",
+    "unplugin-vue-components": "^0.18.5",
+    "vite": "^2.9.0-beta.9",
     "vite-plugin-pages": "^0.22.0",
-    "vitest": "^0.7.7",
-    "vue-tsc": "^0.33.6"
+    "vitest": "^0.7.11",
+    "vue-tsc": "^0.33.9"
   }
 }

@@ -21,7 +21,7 @@ const config = {
 type GameConfig = keyof typeof config | 'customize'
 
 const gameOptions = ref<CreateGameOptions>({
-  ...config['easy'],
+  ...config.easy,
   friendly: true
 })
 const game = createGame(gameOptions)
@@ -37,7 +37,7 @@ const customizeMines = computed(() => {
 })
 
 function resetGame(option: GameConfig | CreateGameOptions) {
-  const { friendly } = unref(gameOptions)
+  const { friendly, seed } = unref(gameOptions)
   let options: CreateGameOptions = {} as any
 
   // https://zh.wikipedia.org/wiki/%E8%B8%A9%E5%9C%B0%E9%9B%B7
@@ -45,14 +45,15 @@ function resetGame(option: GameConfig | CreateGameOptions) {
     case 'easy':
     case 'medium':
     case 'hard':
-      options = { ...config[option], friendly }
+      options = { ...config[option], friendly, seed }
       break
     case 'customize':
       options = {
         width: customize.value.width,
         height: customize.value.height,
         mines: customizeMines.value,
-        friendly: customize.value.friendly
+        friendly: customize.value.friendly,
+        seed
       }
       break
     default:
