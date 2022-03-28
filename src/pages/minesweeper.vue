@@ -167,38 +167,33 @@ function beforeCustomize() {
       @contextmenu="game.mark"
     />
 
-    <div v-show="customizeVisible" fixed top-0 left-0 z-20 w-full h-full bg="black/50 dark:black/90" flex="~" justify-center items-center select-none>
-      <div flex-grow max-w-screen-sm mx-4 p-4 rounded bg="white/90 dark:white/10">
-        <div text-2xl leading="3em">
-          Customize Settings
-        </div>
-        <label flex="~ gap-1 col">
-          Width: {{ customize.width }}
-          <input v-model.number="customize.width" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="30">
-        </label>
-        <label flex="~ gap-1 col">
-          Height: {{ customize.height }}
-          <input v-model.number="customize.height" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="30">
-        </label>
-        <label flex="~ gap-1 col">
-          Mines: {{ customizeMines }} ({{ customize.mines }}%)
-          <input v-model.number="customize.mines" p="2" bg="gray-500/10" text="red-200" type="range" min="15" max="50">
-        </label>
-        <label flex="~ gap-4" items-center>
-          Friendly:
-          <input v-model="customize.friendly" bg="gray-500/10" text="red-200" type="checkbox">
-        </label>
+    <app-dialog :visible="customizeVisible" title="Customize Settings" size="sm">
+      <label flex="~ gap-1 col">
+        Width: {{ customize.width }}
+        <input v-model.number="customize.width" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="30">
+      </label>
+      <label flex="~ gap-1 col">
+        Height: {{ customize.height }}
+        <input v-model.number="customize.height" p="2" bg="gray-500/10" text="red-200" type="range" min="4" max="30">
+      </label>
+      <label flex="~ gap-1 col">
+        Mines: {{ customizeMines }} ({{ customize.mines }}%)
+        <input v-model.number="customize.mines" p="2" bg="gray-500/10" text="red-200" type="range" min="15" max="50">
+      </label>
+      <label flex="~ gap-4" items-center>
+        Friendly:
+        <input v-model="customize.friendly" bg="gray-500/10" text="red-200" type="checkbox">
+      </label>
 
-        <div py-8 flex="~ gap-4" justify-center>
-          <button btn="~ sky" @click="resetGame('customize')">
-            Confirm
-          </button>
-          <button btn="solid-sky" @click="customizeVisible=false">
-            Cancel
-          </button>
-        </div>
+      <div py-8 flex="~ gap-4" justify-center>
+        <button btn="~ sky" @click="resetGame('customize')">
+          Confirm
+        </button>
+        <button btn="solid-sky" @click="customizeVisible=false">
+          Cancel
+        </button>
       </div>
-    </div>
+    </app-dialog>
   </div>
 </template>
 

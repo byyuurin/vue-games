@@ -115,23 +115,20 @@ function beforeCustomize() {
       </button>
     </div>
 
-    <div v-show="customizeVisible" fixed top-0 left-0 z-20 w-full h-full bg="black/50 dark:black/90" flex="~" justify-center items-center select-none>
-      <div flex-grow max-w-screen-sm mx-4 p-4 rounded bg="white/90 dark:white/10">
-        <div text-2xl leading="3em">
-          Customize Settings
-        </div>
-        <label flex="~ gap-1 col">
-          Columns: {{ customize.columns }}
-          <input v-model.number="customize.columns" p="2" bg="gray-500/10" text="red-200" type="range" min="2" max="8">
-        </label>
-        <label flex="~ gap-1 col">
-          Rows: {{ customize.rows }}
-          <input v-model.number="customize.rows" p="2" bg="gray-500/10" text="red-200" type="range" min="2" max="8">
-        </label>
-        <div flex="~ gap-1 col">
-          Image
-          <div py-4 text-center>
-            <div inline-flex flex="wrap gap-2">
+    <app-dialog :visible="customizeVisible" title="Customize Settings" size="md">
+      <label flex="~ gap-1 col">
+        Columns: {{ customize.columns }}
+        <input v-model.number="customize.columns" p="2" bg="gray-500/10" text="red-200" type="range" min="2" max="8">
+      </label>
+      <label flex="~ gap-1 col">
+        Rows: {{ customize.rows }}
+        <input v-model.number="customize.rows" p="2" bg="gray-500/10" text="red-200" type="range" min="2" max="8">
+      </label>
+      <div flex="~ gap-1 col">
+        Image
+        <div py-4 text-center>
+          <div m-auto>
+            <div inline-flex flex="wrap gap-2" justify-center>
               <label
                 v-for="src of images" :key="src"
                 p-4 cursor-pointer rounded
@@ -147,25 +144,25 @@ function beforeCustomize() {
             </div>
           </div>
         </div>
-        <label flex="~ gap-1 col">
-          Or image url
-          <input
-            v-model="customize.url" type="text"
-            bg="gray-500/10"
-            p-2 w-full dark:text-white rounded outline-none
-          >
-        </label>
-
-        <div py-8 flex="~ gap-4" justify-center>
-          <button btn="~ sky" @click="resetGame('customize')">
-            Confirm
-          </button>
-          <button btn="solid-sky" @click="customizeVisible=false">
-            Cancel
-          </button>
-        </div>
       </div>
-    </div>
+      <label flex="~ gap-1 col">
+        Or image url
+        <input
+          v-model="customize.url" type="text"
+          bg="gray-500/10"
+          p-2 w-full dark:text-white rounded outline-none
+        >
+      </label>
+
+      <div py-8 flex="~ gap-4" justify-center>
+        <button btn="~ sky" @click="resetGame('customize')">
+          Confirm
+        </button>
+        <button btn="solid-sky" @click="customizeVisible=false">
+          Cancel
+        </button>
+      </div>
+    </app-dialog>
   </div>
 </template>
 
