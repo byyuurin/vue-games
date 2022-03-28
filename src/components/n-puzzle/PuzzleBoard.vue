@@ -22,13 +22,18 @@ interface Emit {
 const emit = defineEmits<Emit>()
 
 const el = ref<HTMLDivElement|null>(null)
-const imageMaxWidth = ref(props.size)
 const size = ref({
   width: props.size,
   height: props.size,
   gaps: props.state.options.gaps
 })
 
+const imageMaxWidth = computed(() => {
+  const { columns, gaps } = props.state.options
+  return breakpoints.md.value || !el.value
+    ? props.size
+    : Math.floor((el.value.offsetWidth - 20 - (columns - 1) * gaps) / columns)
+})
 const style = computed(() => {
   const { width, height, gaps } = unref(size)
   const { columns } = props.state.options
@@ -41,33 +46,19 @@ const style = computed(() => {
   `
 })
 
-function init() {
-  const { columns, gaps } = props.state.options
-  imageMaxWidth.value = breakpoints.md.value
-    ? props.size
-    : Math.floor((el.value!.offsetWidth - (columns - 1) * gaps) / columns)
-}
-
 function handleLoadSuccess(e: Event) {
   const { width, height } = e.target as HTMLImageElement
 
-  size.value = {
-    ...unref(size),
-    width,
-    height
-  }
+  size.value = { ...unref(size), width, height }
 
   nextTick(()=> {
     isLoading.value = false
   })
 }
 
-watch(()=> props.src, () => {
-  init()
+watch(()=> [props.src], () => {
   isLoading.value = true
 })
-
-useResizeObserver(el, init)
 </script>
 
 <template>

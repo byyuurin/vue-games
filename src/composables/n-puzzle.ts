@@ -123,11 +123,11 @@ function toggleCell(state: Ref<GameState>, from: CellPosition, to: CellPosition)
 }
 
 function checkStatus(state: Ref<GameState>) {
-  const { board } = unref(state)
+  const { timestamp, board } = unref(state)
   isComplete.value = board.every((cell)=>
     cell.origin.x === cell.position.x && cell.origin.y === cell.position.y)
 
-  if (isComplete.value)
+  if (isComplete.value && !timestamp.end)
     state.value.timestamp.end = Date.now()
 
 }
@@ -174,6 +174,8 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
     state.value.steps++
     checkStatus(state)
   }
+
+  checkStatus(state)
 
   return { state, reset, move }
 }

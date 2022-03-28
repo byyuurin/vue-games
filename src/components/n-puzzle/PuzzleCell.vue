@@ -79,8 +79,9 @@ watch([isLoading, isComplete], () => init())
   >
     <div absolute top-0 left-0 pointer-events-none transition duration-100
          :class="{
-           'group-hover:bg-gray-500/10': !slots.default,
-           'group-hover:opacity-50 w-$inner-width translate-x-$inner-x translate-y-$inner-y': slots.default,
+           'group-hover:bg-gray-500/10': !slots.default && !isComplete,
+           'group-hover:opacity-50': slots.default && !isComplete,
+           'w-$inner-width translate-x-$inner-x translate-y-$inner-y': slots.default,
            'opacity-50': reversed || !matched
          }"
     >
