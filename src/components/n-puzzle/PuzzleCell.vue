@@ -77,12 +77,12 @@ watch([isLoading, isComplete], () => init())
     }"
     :style="style"
   >
-    <div absolute top-0 left-0 pointer-events-none transition duration-100
+    <div pointer-events-none transition duration-100
          :class="{
-           'group-hover:bg-gray-500/10': !slots.default && !isComplete,
-           'group-hover:opacity-50': slots.default && !isComplete,
-           'w-$inner-width translate-x-$inner-x translate-y-$inner-y': slots.default,
-           'opacity-50': reversed || !matched
+           'group-hover:opacity-75': !isComplete,
+           'bg-teal-700/50': !slots.default,
+           'absolute left-$inner-x top-$inner-y w-$inner-width': slots.default,
+           'grayscale opacity-50': reversed || !matched
          }"
     >
       <slot>

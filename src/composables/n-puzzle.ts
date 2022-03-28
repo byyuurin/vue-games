@@ -84,11 +84,10 @@ function generateBoard(options: CreateGameOptions, remove: CellPosition): BoardC
 
     if (position.x === remove.x && position.y === remove.y) {
       cell.invisible = true
-      cell.sequence = 0
       exclude = cell.origin.y + position.y
     }
 
-    numbers[position.y * columns + position.x] = cell.sequence
+    numbers[position.y * columns + position.x] = cell.invisible ? 0 : cell.sequence
 
     return cell
   })
