@@ -192,20 +192,19 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
    * 重置遊戲
    */
   const reset = () => {
-    const { width, height } = unref(gameOptions)
+    const { options } = unref(state)
     cache.value = {
       ...unref(cache),
       dangers: 0,
       flags: 0,
-      unknowns: width * height
+      unknowns: options.width * options.height
     }
-    state.value.board = generateBoard(unref(gameOptions))
-    state.value.options = unref(gameOptions)
-
-    if (!dashboard.value.started) return
-
-    state.value.status = null
-    state.value.timestamp = { begin: 0, end: 0 }
+    state.value = {
+      ...unref(state),
+      board: generateBoard(unref(state).options),
+      status: null,
+      timestamp: { begin: 0, end: 0 }
+    }
   }
 
   const stop = (type: GameStatus) => {

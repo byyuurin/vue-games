@@ -33,11 +33,10 @@ const customize = ref<CreateGameOptions>({
 })
 const customizeMines = computed(() => {
   const { width, height, mines } = unref(customize)
-  return Math.round(width * height * mines / 100)
+  return Math.ceil(width * height * mines / 100)
 })
 
 function resetGame(option: GameConfig | CreateGameOptions) {
-  const { friendly, seed } = unref(gameOptions)
   let options: CreateGameOptions = {} as any
 
   // https://zh.wikipedia.org/wiki/%E8%B8%A9%E5%9C%B0%E9%9B%B7
@@ -45,15 +44,17 @@ function resetGame(option: GameConfig | CreateGameOptions) {
     case 'easy':
     case 'medium':
     case 'hard':
-      options = { ...config[option], friendly, seed }
+      options = {
+        ...unref(state).options,
+        ...config[option],
+        friendly: true
+      }
       break
     case 'customize':
       options = {
-        width: customize.value.width,
-        height: customize.value.height,
-        mines: customizeMines.value,
-        friendly: customize.value.friendly,
-        seed
+        ...unref(state).options,
+        ...unref(customize),
+        mines: customizeMines.value
       }
       break
     default:
@@ -67,8 +68,18 @@ function resetGame(option: GameConfig | CreateGameOptions) {
   }
 
   customizeVisible.value = false
-  gameOptions.value = options
+  state.value.options = options
   game.reset()
+}
+
+function beforeCustomize() {
+  const { options } = unref(state)
+  const mines = Math.floor((options.mines * 100) / (options.width * options.height))
+  customize.value = {
+    ...options,
+    mines
+  }
+  customizeVisible.value = true
 }
 </script>
 
@@ -137,7 +148,7 @@ function resetGame(option: GameConfig | CreateGameOptions) {
       <button btn @click="resetGame('hard')">
         Hard
       </button>
-      <button btn @click="customizeVisible=true">
+      <button btn @click="beforeCustomize">
         Customize
       </button>
     </div>
@@ -175,7 +186,7 @@ function resetGame(option: GameConfig | CreateGameOptions) {
         </label>
         <label flex="~ gap-4" items-center>
           Friendly:
-          <input v-model="customize.friendly" p="2" bg="gray-500/10" text="red-200" type="checkbox">
+          <input v-model="customize.friendly" bg="gray-500/10" text="red-200" type="checkbox">
         </label>
 
         <div py-8 flex="~ gap-4" justify-center>
