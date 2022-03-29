@@ -58,6 +58,8 @@ function handleLoadSuccess(e: Event) {
 
 watch(()=> [props.src], () => {
   isLoading.value = true
+}, {
+  immediate: true
 })
 </script>
 
