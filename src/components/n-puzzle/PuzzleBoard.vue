@@ -12,7 +12,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   src: '',
-  size: 100
+  size: 100,
 })
 
 interface Emit {
@@ -25,7 +25,7 @@ const el = ref<HTMLDivElement|null>(null)
 const size = ref({
   width: props.size,
   height: props.size,
-  gaps: props.state.options.gaps
+  gaps: props.state.options.gaps,
 })
 
 const imageMaxWidth = computed(() => {
@@ -59,7 +59,7 @@ function handleLoadSuccess(e: Event) {
 watch(()=> [props.src], () => {
   isLoading.value = true
 }, {
-  immediate: true
+  immediate: true,
 })
 </script>
 

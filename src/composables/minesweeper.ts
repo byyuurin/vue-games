@@ -76,11 +76,11 @@ function nearbyPositions(center: CellPosition, options: MaybeRef<CreateGameOptio
   const directions = [
     [1, 1], [1, 0], [1, -1],
     [0, 1], [0, -1],
-    [-1, 1], [-1, 0], [-1, -1]
+    [-1, 1], [-1, 0], [-1, -1],
   ]
   return directions.map(([offsetX, offsetY]) => ({
     x: center.x + offsetX,
-    y: center.y + offsetY
+    y: center.y + offsetY,
   })).filter(({ x, y }) => x >= 0 && x < width && y >= 0 && y < height)
 }
 
@@ -162,7 +162,7 @@ function createGameCache(state: GameState) {
     seed: options.seed,
     flags,
     dangers,
-    unknowns
+    unknowns,
   })
 }
 
@@ -171,7 +171,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
     options: unref(gameOptions),
     timestamp: { begin: 0, end: 0 },
     status: null,
-    board: generateBoard(gameOptions)
+    board: generateBoard(gameOptions),
   })
 
   const cache = createGameCache(unref(state))
@@ -182,7 +182,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
     return {
       flags, dangers, unknowns,
       started: timestamp.begin > 0,
-      unusedFlags: options.mines - flags
+      unusedFlags: options.mines - flags,
     }
   })
 
@@ -197,13 +197,13 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
       ...unref(cache),
       dangers: 0,
       flags: 0,
-      unknowns: options.width * options.height
+      unknowns: options.width * options.height,
     }
     state.value = {
       ...unref(state),
       board: generateBoard(unref(state).options),
       status: null,
-      timestamp: { begin: 0, end: 0 }
+      timestamp: { begin: 0, end: 0 },
     }
   }
 

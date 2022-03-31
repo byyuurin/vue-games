@@ -15,21 +15,21 @@ const help = useDraggable(helpEl, { initialValue: { x: 200, y: 400 } })
 const config = {
   easy: { width: 8, height: 8, mines: 10 },
   medium: { width: 16, height: 16, mines: 40 },
-  hard: { width: 30, height: 16, mines: 99 }
+  hard: { width: 30, height: 16, mines: 99 },
 }
 
 type GameConfig = keyof typeof config | 'customize'
 
 const gameOptions = ref<CreateGameOptions>({
   ...config.easy,
-  friendly: true
+  friendly: true,
 })
 const game = createGame(gameOptions)
 const { state, dashboard } = game
 const customizeVisible = ref(false)
 const customize = ref<CreateGameOptions>({
   ...unref(state).options,
-  mines: 15
+  mines: 15,
 })
 const customizeMines = computed(() => {
   const { width, height, mines } = unref(customize)
@@ -47,14 +47,14 @@ function resetGame(option: GameConfig | CreateGameOptions) {
       options = {
         ...unref(state).options,
         ...config[option],
-        friendly: true
+        friendly: true,
       }
       break
     case 'customize':
       options = {
         ...unref(state).options,
         ...unref(customize),
-        mines: customizeMines.value
+        mines: customizeMines.value,
       }
       break
     default:
@@ -77,7 +77,7 @@ function beforeCustomize() {
   const mines = Math.floor((options.mines * 100) / (options.width * options.height))
   customize.value = {
     ...options,
-    mines
+    mines,
   }
   customizeVisible.value = true
 }

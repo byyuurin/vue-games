@@ -9,13 +9,13 @@ import { createGame, isComplete, isLoading }from '/src/composables/n-puzzle'
 const config = {
   easy: { columns: 3, rows: 3 },
   medium: { columns: 4, rows: 4 },
-  hard: { columns: 5, rows: 5 }
+  hard: { columns: 5, rows: 5 },
 }
 const images = [
   'https://cdn.discordapp.com/attachments/757420273350868993/957120284085866516/LINE_ALBUM_300_220309_111.jpg',
   'https://cdn.discordapp.com/attachments/757420273350868993/957120284434006086/LINE_ALBUM_300_220309_132.jpg',
   'https://cdn.discordapp.com/attachments/757420273350868993/957120284706603008/LINE_ALBUM_300_220309_197.jpg',
-  'https://cdn.discordapp.com/attachments/757420273350868993/957120284996018266/LINE_ALBUM_300_220309_286.jpg'
+  'https://cdn.discordapp.com/attachments/757420273350868993/957120284996018266/LINE_ALBUM_300_220309_286.jpg',
 ]
 const randomImage = () => images[Math.floor(Math.random() * images.length)]
 type GameConfig = keyof typeof config | 'customize'
@@ -25,7 +25,7 @@ const customizeVisible = ref(false)
 const customize = ref({
   ...unref(state).options,
   background: '',
-  url: ''
+  url: '',
 })
 const reversed = ref(false)
 const toggleReversed = useToggle(reversed)
@@ -40,7 +40,7 @@ function resetGame(option: GameConfig | CreateGameOptions) {
       options = {
         ...unref(state).options,
         ...config[option],
-        background: randomImage()
+        background: randomImage(),
       }
       break
     case 'customize':
@@ -48,7 +48,7 @@ function resetGame(option: GameConfig | CreateGameOptions) {
         ...unref(state).options,
         columns: customize.value.columns,
         rows: customize.value.rows,
-        background: customize.value.url || customize.value.background
+        background: customize.value.url || customize.value.background,
       }
       break
     default:
@@ -65,7 +65,7 @@ function beforeCustomize() {
   customize.value = {
     background: '',
     ...unref(state).options,
-    url: ''
+    url: '',
   }
   customizeVisible.value = true
 }

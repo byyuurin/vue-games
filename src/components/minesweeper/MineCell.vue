@@ -23,7 +23,7 @@ const statusClasses = computed(() => {
     'text-yellow-600',
     'text-amber-600',
     'text-orange-600',
-    'text-red-600'
+    'text-red-600',
   ]
 
   if (props.viewed) {

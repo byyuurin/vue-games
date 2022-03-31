@@ -35,7 +35,7 @@ export interface CreateGameOptions {
 function indexToPosition(i: number, columns: number): CellPosition{
   return {
     x: i % columns,
-    y: Math.floor(i / columns)
+    y: Math.floor(i / columns),
   }
 }
 
@@ -74,7 +74,7 @@ function generateBoard(options: CreateGameOptions, remove: CellPosition): BoardC
       origin: position,
       position: position,
       columns,
-      gaps
+      gaps,
     }
     maybes.push(position)
     return cell
@@ -104,7 +104,7 @@ function moveable(from: CellPosition, to: CellPosition) {
     { ...from, x: from.x + 1 },
     { ...from, x: from.x - 1 },
     { ...from, y: from.y + 1 },
-    { ...from, y: from.y - 1 }
+    { ...from, y: from.y - 1 },
   ]
   return nearby.some((p) => p.x === to.x && p.y === to.y)
 }
@@ -149,7 +149,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
     timestamp: { begin: 0, end: 0 },
     options: unref(gameOptions),
     board: generateBoard(unref(gameOptions), current),
-    steps: 0
+    steps: 0,
   })
 
   const reset = () => {
@@ -159,7 +159,7 @@ export function createGame(gameOptions: MaybeRef<CreateGameOptions>) {
       timestamp: { begin: 0, end: 0 },
       options,
       board: generateBoard(options, current),
-      steps: 0
+      steps: 0,
     }
   }
 

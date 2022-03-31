@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
   position: () => ({ x: 0, y: 0 }),
   columns: 0,
   gaps: 0,
-  invisible: false
+  invisible: false,
 })
 
 const slots = useSlots()
@@ -31,16 +31,16 @@ const style = computed(() => {
   const { width, height } = unref(size)
   const offset = {
     x: (reversed ? origin : position).x - origin.x,
-    y: (reversed ? origin : position).y - origin.y
+    y: (reversed ? origin : position).y - origin.y,
   }
   const self = {
     x: offset.x * (width + gaps),
-    y: offset.y * (height + gaps)
+    y: offset.y * (height + gaps),
   }
   const inner = {
     x: -1 * origin.x * width + origin.x * gaps,
     y: -1 * origin.y * height + origin.y * gaps,
-    width: columns * width + (columns - 1) * gaps
+    width: columns * width + (columns - 1) * gaps,
   }
   return `
   --self-width: ${width}px;
@@ -56,7 +56,7 @@ const style = computed(() => {
 function init() {
   size.value = {
     width: el.value!.offsetWidth,
-    height: el.value!.offsetHeight
+    height: el.value!.offsetHeight,
   }
 }
 
