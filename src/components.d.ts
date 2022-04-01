@@ -6,6 +6,8 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppDialog: typeof import('./components/AppDialog.vue')['default']
     AppHeader: typeof import('./components/AppHeader.vue')['default']
+    GridBoard: typeof import('./components/2048/GridBoard.vue')['default']
+    GridTile: typeof import('./components/2048/GridTile.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     MineBoard: typeof import('./components/minesweeper/MineBoard.vue')['default']
     MineCell: typeof import('./components/minesweeper/MineCell.vue')['default']
