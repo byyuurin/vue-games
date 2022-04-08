@@ -104,9 +104,8 @@ function expandCells(cache: Ref<GameCache>, state: Ref<GameState>, current: Boar
 
 function generateBoard(options: MaybeRef<CreateGameOptions>) {
   const { width, height } = unref(options)
-  return Array.from({ length: height })
-    .map((_, y) => Array.from({ length: width })
-      .map((_, x) => ({ position: { x, y }, counts: 0 } as BoardCell)))
+  return Array.from({ length: height }, (_, y) =>
+    Array.from({ length: width }, (_, x) => (<BoardCell>{ position: { x, y }, counts: 0 })))
 }
 
 function generateMines(cache: Ref<GameCache>, state: Ref<GameState>, current: CellPosition) {

@@ -67,7 +67,7 @@ function generateBoard(options: CreateGameOptions, remove: CellPosition): BoardC
   const numbers: number[] = [] // 打亂後的順序號碼
   const maybes: CellPosition[] = []
   let exclude = 0
-  const cells = Array.from({ length: columns * rows }).map((_, i) => {
+  const cells = Array.from({ length: columns * rows }, (_, i) => {
     const position = indexToPosition(i, columns)
     const cell: BoardCell = {
       sequence: i + 1,

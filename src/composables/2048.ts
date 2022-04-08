@@ -74,14 +74,12 @@ export function generateTile(board: GameBoard) {
 
 function generateBoard(size: number) {
   const board: GameBoard = {
-    cells: Array
-      .from({ length: size * size })
-      .map((_, index) => ({
-        index,
-        x: index % size,
-        y: Math.floor(index / size),
-        tileIndex: null,
-      })),
+    cells: Array.from({ length: size * size }, (_, index) => ({
+      index,
+      x: index % size,
+      y: Math.floor(index / size),
+      tileIndex: null,
+    })),
     tiles: {},
   }
 
